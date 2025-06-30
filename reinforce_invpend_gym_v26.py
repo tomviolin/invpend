@@ -247,7 +247,7 @@ class REINFORCE:
 
 import inverted_pendulum_v9  # Import the custom environment
 gym.envs.register(
-    id='tomh/InvertedPendulum-v9',
+    id='InvertedPendulum-v9',
     entry_point='inverted_pendulum_v9:InvertedPendulumEnv',
     max_episode_steps=1000,
     reward_threshold=500.0,
@@ -255,7 +255,8 @@ gym.envs.register(
 #default to training mode with no rendering
 
 # Create and wrap the environment
-env = gym.make("tomh/InvertedPendulum-v9", render_mode='human', xml_file="/home/tomh/invpend/mip2.xml" )
+env = gym.make("InvertedPendulum-v9", render_mode='human', xml_file="/home/tomh/invpend/my_inverted_pendulum.xml",
+        frame_skip =1)
                
 #               xml_file="inverted_pendulum.xml")
 wrapped_env = gym.wrappers.RecordEpisodeStatistics(env, 50)  # Records episode-reward
@@ -317,7 +318,7 @@ df1 = pd.DataFrame(rewards_to_plot).melt()
 df1.rename(columns={"variable": "episodes", "value": "reward"}, inplace=True)
 sns.set(style="darkgrid", context="talk", palette="rainbow")
 sns.lineplot(x="episodes", y="reward", data=df1).set(
-    title="REINFORCE for InvertedPendulum-v9"
+    title="REINFORCE for InvertedPendulum-v5"
 )
 plt.show()
 

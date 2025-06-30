@@ -85,7 +85,7 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
 
     ```python
     import gymnasium as gym
-    env = gym.make('InvertedPendulum-v9', reset_noise_scale=0.1)
+    env = gym.make('InvertedPendulum-v5', reset_noise_scale=0.1)
     ```
 
     | Parameter               | Type       | Default                 | Description                                                                                   |
@@ -94,7 +94,6 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
     | `reset_noise_scale`     | **float**  | `0.01`                  | Scale of random perturbations of initial position and velocity (see `Starting State` section) |
 
     ## Version History
-    * v9: Local copy.
     * v5:
         - Minimum `mujoco` version is now 2.3.3.
         - Added support for fully custom/third party `mujoco` models using the `xml_file` argument (previously only a few changes could be made to the existing models).
