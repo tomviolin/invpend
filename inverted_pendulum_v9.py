@@ -1,5 +1,5 @@
 __credits__ = ["Kallinteris-Andreas"]
-
+import os
 from typing import Dict, Union
 
 import numpy as np
@@ -122,7 +122,7 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
 
     def __init__(
         self,
-        xml_file: str = "/Users/tomvi/invpend/mod_inverted_pendulum.xml",
+        xml_file: str = os.path.realpath("mod_inverted_pendulum.xml"),
         frame_skip: int = 1,
         default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
         reset_noise_scale: float = 0.01,
