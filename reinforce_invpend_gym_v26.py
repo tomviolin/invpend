@@ -60,7 +60,8 @@ from gymnasium.envs.mujoco import MujocoEnv
 plt.rcParams["figure.figsize"] = (10, 5)
 
 #MujocoEnv = MujocoEnv  # For type hinting
-
+import os
+os.system("clear")
 
 # %%
 # Policy Network
@@ -249,23 +250,25 @@ import inverted_pendulum_v9  # Import the custom environment
 gym.envs.register(
     id='InvertedPendulum-v9',
     entry_point='inverted_pendulum_v9:InvertedPendulumEnv',
-    max_episode_steps=1000,
+    max_episode_steps=80,
     reward_threshold=500.0,
 )
 #default to training mode with no rendering
 
 # Create and wrap the environment
-env = gym.make("InvertedPendulum-v9", render_mode='human', xml_file="/home/tomh/invpend/my_inverted_pendulum.xml",
+env = gym.make("InvertedPendulum-v9", render_mode='human', #xml_file="/home/tomh/invpend/mod_inverted_pendulum.xml", #newfreee.xml", #my_inverted_pendulum.xml",
         frame_skip =1)
                
 #               xml_file="inverted_pendulum.xml")
 wrapped_env = gym.wrappers.RecordEpisodeStatistics(env, 50)  # Records episode-reward
 
-total_num_episodes = int(5e2)  # Total number of episodes
+total_num_episodes = int(5e1)  # Total number of episodes
 # Observation-space of InvertedPendulum-v9 (4)
 obs_space_dims = env.observation_space.shape[0]
+print(f"Observation space dimensions: {obs_space_dims}")
 # Action-space of InvertedPendulum-v9 (1)
 action_space_dims = env.action_space.shape[0]
+print(f"Action space dimensions: {action_space_dims}")
 rewards_over_seeds = []
 
 for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds

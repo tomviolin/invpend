@@ -1,0 +1,10 @@
+<mujoco>
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>  <!-- Define a light source -->
+    <geom type="plane" size="1 1 0.1" rgba=".9 0 0 1"/> <!-- Define a fixed plane (ground) -->
+    <body pos="0 0 1">  <!-- Create a new body element -->
+      <joint type="free"/>  <!-- Add a free joint to this body -->
+      <geom type="box" size=".1 .2 .3" rgba="0 .9 0 1"/> <!-- Add a box geometry to the body -->
+    </body>
+  </worldbody>
+</mujoco>

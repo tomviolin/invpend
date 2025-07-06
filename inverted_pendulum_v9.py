@@ -122,14 +122,14 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
 
     def __init__(
         self,
-        xml_file: str = "inverted_pendulum.xml",
+        xml_file: str = "/home/tomh/invpend/mod_inverted_pendulum.xml",
         frame_skip: int = 2,
         default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
         reset_noise_scale: float = 0.01,
         **kwargs,
     ):
         utils.EzPickle.__init__(self, xml_file, frame_skip, reset_noise_scale, **kwargs)
-        observation_space = Box(low=-np.inf, high=np.inf, shape=(4,), dtype=np.float64)
+        observation_space = Box(low=-np.inf, high=np.inf, shape=(15,), dtype=np.float64)
 
         self._reset_noise_scale = reset_noise_scale
 
@@ -148,22 +148,33 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
                 "rgb_array",
                 "depth_array",
             ],
-            "render_fps": int(np.round(1.0 / self.dt)),
+            "render_fps": 2, #ZZZZint(np.round(1.0 / self.dt)),
         }
 
         self.observation_structure = {
             "qpos": self.data.qpos.size,
             "qvel": self.data.qvel.size,
         }
+        print(f"Observation structure: %s", self.observation_structure)
 
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
 
         observation = self._get_obs()
 
-        terminated = bool(
-            not np.isfinite(observation).all() or (np.abs(observation[1]) > 0.2)
-        )
+        print(f"Observations: [{observation.shape}] ")
+        for i, obs in enumerate(observation):
+            color = ""
+            graph=(obs+1.0)
+            graph = int(graph * 10)
+            if graph < 0: graph = 0
+            if graph > 20: graph = 20
+            if obs < 0:
+                color = '\x1b[31m'
+            print(f"{color}  Observation[{i:02d}]: {obs:5.2f} {'*' * graph}\x1b[0m")
+        terminated = bool(0)
+        #    not np.isfinite(observation).all() or (np.abs(observation[1]) > 0.2)
+        #)
 
         reward = int(not terminated)
 
