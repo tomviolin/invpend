@@ -99,7 +99,7 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
         - Minimum `mujoco` version is now 2.3.3.
         - Added support for fully custom/third party `mujoco` models using the `xml_file` argument (previously only a few changes could be made to the existing models).
         - Added `default_camera_config` argument, a dictionary for setting the `mj_camera` properties, mainly useful for custom environments.
-        - Added `env.observation_structure`, a dictionary for specifying the observation space compose (e.g. `qpos`, `qvel`), useful for building tooling and wrappers for the MuJoCo environments.
+        - Added `env.observation_structure`, a dictionary for specifying the observation space compose (e.g. ``qpos``, `qvel`), useful for building tooling and wrappers for the MuJoCo environments.
         - Added `frame_skip` argument, used to configure the `dt` (duration of `step()`), default varies by environment check environment documentation pages.
         - Fixed bug: `healthy_reward` was given on every step (even if the Pendulum is unhealthy), now it is only given if the Pendulum is healthy (not terminated) (related [GitHub issue](https://github.com/Farama-Foundation/Gymnasium/issues/500)).
         - Added `xml_file` argument.
@@ -122,8 +122,8 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
 
     def __init__(
         self,
-        xml_file: str = "/home/tomh/invpend/mod_inverted_pendulum.xml",
-        frame_skip: int = 2,
+        xml_file: str = "/Users/tomvi/invpend/mod_inverted_pendulum.xml",
+        frame_skip: int = 1,
         default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
         reset_noise_scale: float = 0.01,
         **kwargs,
@@ -161,8 +161,8 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
         self.do_simulation(action, self.frame_skip)
 
         observation = self._get_obs()
-
-        print(f"Observations: [{observation.shape}] ")
+        
+        print(f"\x1b[0;0HObservations: [{observation.shape}]      ")
         for i, obs in enumerate(observation):
             color = ""
             graph=(obs+1.0)
@@ -171,8 +171,13 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
             if graph > 20: graph = 20
             if obs < 0:
                 color = '\x1b[31m'
-            print(f"{color}  Observation[{i:02d}]: {obs:5.2f} {'*' * graph}\x1b[0m")
-        terminated = bool(0)
+            print(f"{color}  Observation[{i:02d}]: {obs:5.2f} {'*' * graph}{' '*(20-graph)}\x1b[0m")
+            if i % 3 == 2:
+                print("")
+        terminated = bool(
+            not np.isfinite(observation).all() or ((observation[3]) < 0.0)
+        )
+        # The following line is commented out as it is not used in the current implementation.
         #    not np.isfinite(observation).all() or (np.abs(observation[1]) > 0.2)
         #)
 

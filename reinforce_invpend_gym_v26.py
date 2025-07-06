@@ -250,8 +250,8 @@ import inverted_pendulum_v9  # Import the custom environment
 gym.envs.register(
     id='InvertedPendulum-v9',
     entry_point='inverted_pendulum_v9:InvertedPendulumEnv',
-    max_episode_steps=80,
-    reward_threshold=500.0,
+    max_episode_steps=100,  # Set the maximum number of steps per episode
+    reward_threshold=1500.0,  # Set a reward threshold for success
 )
 #default to training mode with no rendering
 
@@ -260,9 +260,9 @@ env = gym.make("InvertedPendulum-v9", render_mode='human', #xml_file="/home/tomh
         frame_skip =1)
                
 #               xml_file="inverted_pendulum.xml")
-wrapped_env = gym.wrappers.RecordEpisodeStatistics(env, 50)  # Records episode-reward
+wrapped_env = gym.wrappers.RecordEpisodeStatistics(env, 500)  # Records episode-reward
 
-total_num_episodes = int(5e1)  # Total number of episodes
+total_num_episodes = int(500)  # Total number of episodes
 # Observation-space of InvertedPendulum-v9 (4)
 obs_space_dims = env.observation_space.shape[0]
 print(f"Observation space dimensions: {obs_space_dims}")
@@ -286,7 +286,9 @@ for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds
         obs, info = wrapped_env.reset(seed=seed)
 
         done = False
+        numsteps = 0  # Number of steps in the episode
         while not done:
+            numsteps += 1
             action = agent.sample_action(obs)
 
             # Step return type - `tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]`
@@ -294,7 +296,8 @@ for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds
             # if the episode is terminated, if the episode is truncated and
             # additional info from the step
             obs, reward, terminated, truncated, info = wrapped_env.step(action)
-            agent.rewards.append(reward)
+            agent.rewards.append(reward*numsteps) # Store the reward scaled by the number of steps taken so far.
+            # this rewards the agent for keeping the pole upright for longer.
 
             # End the episode when either truncated or terminated is true
             #  - truncated: The episode duration reaches max number of timesteps
@@ -316,7 +319,7 @@ for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds
 # ~~~~~~~~~~~~~~~~~~~
 #
 
-rewards_to_plot = [[reward[0] for reward in rewards] for rewards in rewards_over_seeds]
+rewards_to_plot = [[reward for reward in rewards] for rewards in rewards_over_seeds]
 df1 = pd.DataFrame(rewards_to_plot).melt()
 df1.rename(columns={"variable": "episodes", "value": "reward"}, inplace=True)
 sns.set(style="darkgrid", context="talk", palette="rainbow")
