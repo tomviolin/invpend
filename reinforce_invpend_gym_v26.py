@@ -55,6 +55,8 @@ from torch.distributions.normal import Normal
 
 import gymnasium as gym
 
+import gymnasium.envs 
+
 from gymnasium.envs.mujoco import MujocoEnv
 
 plt.rcParams["figure.figsize"] = (10, 5)
@@ -91,7 +93,7 @@ class Policy_Network(nn.Module):
         super().__init__()
 
         hidden_space1 = 16  # Nothing special with 16, feel free to change
-        hidden_space2 = 32  # Nothing special with 32, feel free to change
+        hidden_space2 =32 # Nothing special with 32, feel free to change
 
         # Shared Network
         self.shared_net = nn.Sequential(
@@ -161,7 +163,7 @@ class REINFORCE:
         """
 
         # Hyperparameters
-        self.learning_rate = 1e-4  # Learning rate for policy optimization
+        self.learning_rate = 5e-5  # Learning rate for policy optimization
         self.gamma = 0.99  # Discount factor
         self.eps = 1e-6  # small number for mathematical stability
 
@@ -250,8 +252,8 @@ import inverted_pendulum_v9  # Import the custom environment
 gym.envs.register(
     id='InvertedPendulum-v9',
     entry_point='inverted_pendulum_v9:InvertedPendulumEnv',
-    max_episode_steps=100,  # Set the maximum number of steps per episode
-    reward_threshold=1500.0,  # Set a reward threshold for success
+    max_episode_steps=300,  # Set the maximum number of steps per episode
+    reward_threshold=900.0,  # Set a reward threshold for success
 )
 #default to training mode with no rendering
 
@@ -260,9 +262,9 @@ env = gym.make("InvertedPendulum-v9", render_mode='human', #xml_file="/home/tomh
         frame_skip =1)
                
 #               xml_file="inverted_pendulum.xml")
-wrapped_env = gym.wrappers.RecordEpisodeStatistics(env, 500)  # Records episode-reward
+wrapped_env = gym.wrappers.RecordEpisodeStatistics(env, 50)  # Records episode-reward
 
-total_num_episodes = int(500)  # Total number of episodes
+total_num_episodes = int(1000)  # Total number of episodes
 # Observation-space of InvertedPendulum-v9 (4)
 obs_space_dims = env.observation_space.shape[0]
 print(f"Observation space dimensions: {obs_space_dims}")
@@ -296,7 +298,7 @@ for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds
             # if the episode is terminated, if the episode is truncated and
             # additional info from the step
             obs, reward, terminated, truncated, info = wrapped_env.step(action)
-            agent.rewards.append(reward*numsteps) # Store the reward scaled by the number of steps taken so far.
+            agent.rewards.append(reward*numsteps+obs[3]*10.0) # Store the reward scaled by the number of steps taken so far.
             # this rewards the agent for keeping the pole upright for longer.
 
             # End the episode when either truncated or terminated is true
@@ -307,7 +309,7 @@ for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds
         reward_over_episodes.append(wrapped_env.return_queue[-1])
         agent.update()
 
-        if episode % 1000 == 0:
+        if episode % 100 == 0:
             avg_reward = int(np.mean(wrapped_env.return_queue))
             print("Episode:", episode, "Average Reward:", avg_reward)
 

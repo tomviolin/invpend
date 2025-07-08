@@ -161,7 +161,7 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
         self.do_simulation(action, self.frame_skip)
 
         observation = self._get_obs()
-        
+        '''        
         print(f"\x1b[0;0HObservations: [{observation.shape}]      ")
         for i, obs in enumerate(observation):
             color = ""
@@ -174,8 +174,9 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
             print(f"{color}  Observation[{i:02d}]: {obs:5.2f} {'*' * graph}{' '*(20-graph)}\x1b[0m")
             if i % 3 == 2:
                 print("")
+        '''     
         terminated = bool(
-            not np.isfinite(observation).all() or ((observation[3]) < 0.0)
+            not np.isfinite(observation).all() or ((observation[3]) < -0.3)
         )
         # The following line is commented out as it is not used in the current implementation.
         #    not np.isfinite(observation).all() or (np.abs(observation[1]) > 0.2)
