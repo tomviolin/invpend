@@ -147,8 +147,6 @@ class Policy_Network(nn.Module):
         self.shared_net = nn.Sequential(
             nn.Linear(obs_space_dims, hidden_space1),
             nn.Tanh(),
-            nn.Linear(hidden_space1, hidden_space1),
-            nn.ReLU(),
             nn.Linear(hidden_space1, hidden_space2),
             nn.Tanh(),
         ).cuda()
@@ -156,7 +154,7 @@ class Policy_Network(nn.Module):
         # Policy Mean specific Linear Layer
         self.policy_mean_net = nn.Sequential(
             nn.Linear(hidden_space2, action_space_dims),
-            #nn.ReLU(),  # Using ReLU activation for the output layer 
+            nn.ReLU(),  # Using ReLU activation for the output layer 
         ).cuda()
 
         # Policy Std Dev specific Linear Layer
@@ -435,10 +433,10 @@ plt.savefig(figfile)
 resultsfile = os.path.join(datadir,"results.json")
 resultsdata = { "meanfirstthird": meanfirstthird, "meanlastthird": meanlastthird }
 open(resultsfile,"w").write(json.dumps(resultsdata))
-
+plt.close('all')
 
 #os.system(f'eog "{figfile}" &')
-plt.show()
+#plt.show()
 
 agent.close()
 wrapped_env.close()

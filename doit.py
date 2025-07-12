@@ -30,9 +30,16 @@ slotcmds = [""] * num_slots
 trialdir = os.path.join(projdir, 'trials', f'trial_{trialdatestamp}')
 procno = 0
 
-#for lr in np.arange(0.000301, 0.000901, 0.000001):
-for lrp in np.arange(-4, -1, 0.01):
-    lr = 10 ** lrp
+logscale = True
+
+# construct list of learning rates
+if logscale:
+    lr_list = np.pow(10.0, np.arange(-10, -5, 0.0001))
+else:
+    lr_list = np.arange(0.000301, 0.000901, 0.000001)
+
+#for lr in :
+for lr in lr_list:
     slotno = procno % num_slots
     rundatestamp = datetime.now().strftime('%Y_%m%d_%H%M%S')
     rundir = os.path.join(trialdir, f'lr_{procno:04d}_{lr:0.6f}')
@@ -43,10 +50,11 @@ for lrp in np.arange(-4, -1, 0.01):
 
     settings = { 
                 "learning_rate": lr, 
-                "total_num_episodes": 80,
-                "hidden_space1": 48,
-                "hidden_space2":  19,
-                "render_mode": "none"
+                "total_num_episodes": 500,
+                "hidden_space1": 20,
+                "hidden_space2": 20,
+                "render_mode": "none",
+                "xscale":"log" if logscale else "lin"
     } 
 
     settings_file = os.path.join(rundir,"settings.json")
@@ -70,7 +78,7 @@ for cmd in slotcmds:
     print(f"$ bash {batchfile} &")
     os.system(f"bash {batchfile} &")
     procno += 1
-    time.sleep(1)
+    time.sleep(.1)
     
 """
 if not os.path.exists(logdir):
