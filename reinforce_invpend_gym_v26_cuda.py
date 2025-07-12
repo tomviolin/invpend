@@ -49,10 +49,9 @@ and returns five variables:
 from __future__ import annotations
 
 
-import json
 import sys,os,glob
 
-import time
+
 import signal
 import sys
 
@@ -64,17 +63,12 @@ signal.signal(signal.SIGINT, signal_handler)
 
 
 def read_hyper(hypname, default):
-    #print(f"reading hyperparameter {hypname} with default {default}")
     if len(sys.argv)>1 and os.path.exists(sys.argv[1]):
-        #print(f"reading hyperparameter {hypname} from {sys.argv[1]}")
         try:
             value = json.load(open(sys.argv[1],'r'))[hypname]
         except Exception as e:
-            #print(f"couldn't read from file: {e}")
             return default
-        #print(f"returning hyperparameter {hypname}={value} from {sys.argv[1]}")
         return value
-    #print(f"returning hyperparameter {hypname}={default} as default")
     return default
 
 if len(sys.argv) > 1:
@@ -91,6 +85,7 @@ os.system(f"cp *.py {datadir}")
 MAX_EPISODE_STEPS = 85     # Maximum number of steps per episode
 TOTAL_NUM_EPISODES = int(read_hyper("total_num_episodes", 1000))   # Number of episodes to run
 
+import json
 
 import random
 
@@ -112,6 +107,7 @@ plt.rcParams["figure.figsize"] = (10, 5)
 
 #MujocoEnv = MujocoEnv  # For type hinting
 
+os.system("clear")
 
 # %%
 # Policy Network
@@ -147,8 +143,6 @@ class Policy_Network(nn.Module):
         self.shared_net = nn.Sequential(
             nn.Linear(obs_space_dims, hidden_space1),
             nn.Tanh(),
-            nn.Linear(hidden_space1, hidden_space1),
-            nn.ReLU(),
             nn.Linear(hidden_space1, hidden_space2),
             nn.Tanh(),
         ).cuda()
@@ -157,14 +151,14 @@ class Policy_Network(nn.Module):
         self.policy_mean_net = nn.Sequential(
             nn.Linear(hidden_space2, action_space_dims),
             #nn.ReLU(),  # Using ReLU activation for the output layer 
-        ).cuda()
+        )
 
         # Policy Std Dev specific Linear Layer
         self.policy_stddev_net = nn.Sequential(
             nn.Linear(hidden_space2, action_space_dims)
-        ).cuda()
+        )
 
-    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor.cuda(), torch.Tensor.cuda()]:
         """Conditioned on the observation, returns the mean and standard deviation
          of a normal distribution from which an action is sampled from.
 
@@ -175,14 +169,14 @@ class Policy_Network(nn.Module):
             action_means: predicted mean of the normal distribution
             action_stddevs: predicted standard deviation of the normal distribution
         """
-        shared_features = self.shared_net(x.float())
+        shared_features = self.shared_net(x.float().cuda())
 
         action_means = self.policy_mean_net(shared_features)
         action_stddevs = torch.log(
             1 + torch.exp(self.policy_stddev_net(shared_features))
         )
 
-        return action_means.cuda(), action_stddevs.cuda()
+        return action_means, action_stddevs
 
 
 # %%
@@ -310,7 +304,7 @@ gym.envs.register(
 #default to training mode with no rendering
 
 # Create and wrap the environment
-env = gym.make("InvertedPendulum-v9", render_mode=read_hyper('render_mode','human'), #xml_file="/home/tomh/invpend/mod_inverted_pendulum.xml", #newfreee.xml", #my_inverted_pendulum.xml",
+env = gym.make("InvertedPendulum-v9", render_mode=None, #xml_file="/home/tomh/invpend/mod_inverted_pendulum.xml", #newfreee.xml", #my_inverted_pendulum.xml",
         frame_skip =1)
                
 #               xml_file="inverted_pendulum.xml")
@@ -325,7 +319,7 @@ action_space_dims = env.action_space.shape[0]
 print(f"Action space dimensions: {action_space_dims}")
 rewards_over_seeds = []
 
-for seed in [int(read_hyper("seed", time.time()*10000))% (2**32)]:  # Fibonacci seeds
+for seed in [int(read_hyper("seed", 1234)),]:  # Fibonacci seeds
     # set seed
     torch.manual_seed(seed)
     random.seed(seed)
@@ -333,7 +327,7 @@ for seed in [int(read_hyper("seed", time.time()*10000))% (2**32)]:  # Fibonacci 
 
     # Reinitialize agent every seed
     agent = REINFORCE(obs_space_dims, action_space_dims)
-    dict_file = os.path.join(datadir,f"reinforce_invpend_gym_v26.pth");
+    dict_file = os.path.join(datadir,f"reinforce_invpend_gym_v26_seed_{seed}.pth");
     if os.path.exists(dict_file):
         print(f"Loading saved model for seed {seed}")
         agent.net.load_state_dict(torch.load(dict_file))

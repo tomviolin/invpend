@@ -198,3 +198,21 @@ cython_debug/
 ~*
 
 .condarepo
+*.condarepo
+
+trials
+trials/
+trials/*
+
+pretrials
+pretrials/
+pretrials/*
+
+*trials
+*trials/
+*trials/*
+
+*.png
+results.json
+settings.json
+

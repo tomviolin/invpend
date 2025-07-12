@@ -148,7 +148,7 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
                 "rgb_array",
                 "depth_array",
             ],
-            "render_fps": 2, #ZZZZint(np.round(1.0 / self.dt)),
+            "render_fps": int(np.round(1.0 / self.dt)),
         }
 
         self.observation_structure = {
@@ -161,9 +161,10 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
         self.do_simulation(action, self.frame_skip)
 
         observation = self._get_obs()
-        '''        
-        print(f"\x1b[0;0HObservations: [{observation.shape}]      ")
-        for i, obs in enumerate(observation):
+        
+        #print(f"\x1b[0;0HObservations: [{observation.shape}]      ")
+        """
+        for i, obs in enumerate((observation[3],)):
             color = ""
             graph=(obs+1.0)
             graph = int(graph * 10)
@@ -171,18 +172,24 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
             if graph > 20: graph = 20
             if obs < 0:
                 color = '\x1b[31m'
-            print(f"{color}  Observation[{i:02d}]: {obs:5.2f} {'*' * graph}{' '*(20-graph)}\x1b[0m")
-            if i % 3 == 2:
-                print("")
-        '''     
+            print(f"{color}  Observation[{i:02d}]: {obs:5.2f} {' ' * graph}*\x1b[0m")
+            #if i % 3 == 2:
+        """
+        
         terminated = bool(
-            not np.isfinite(observation).all() or ((observation[3]) < -0.3)
+            not np.isfinite(observation).all() or ((observation[3]) < 0.15 )
         )
-        # The following line is commented out as it is not used in the current implementation.
+        #
         #    not np.isfinite(observation).all() or (np.abs(observation[1]) > 0.2)
         #)
 
-        reward = int(not terminated)
+        reward = not int(terminated)  # Reward is 1 for each step survived, plus the angle of the pole
+        #1.0-np.abs(observation[1]) ## # int(not terminated)*observation[3]   # Reward is 1 for each step survived, plus the angle of the pole
+        #if terminated:
+        #    reward = observation[3]+3
+        #else:
+        #    reward = 0
+        
 
         info = {"reward_survive": reward}
 
@@ -201,8 +208,11 @@ class InvertedPendulumEnv(MujocoEnv, utils.EzPickle):
         qvel = self.init_qvel + self.np_random.uniform(
             size=self.model.nv, low=noise_low, high=noise_high
         )
+        #qvel[1] = self.np_random.uniform(low=-1.0, high=1.0)
         self.set_state(qpos, qvel)
+        self.data.qpos[1] = np.random.random() -0.5
+        self.data.qpos[0] = np.random.random() - 0.5
         return self._get_obs()
 
     def _get_obs(self):
-        return np.concatenate([self.data.qpos, self.data.qvel]).ravel()
+        return np.concatenate([self.data.qpos, self.data.qvel])

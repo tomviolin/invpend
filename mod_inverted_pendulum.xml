@@ -1,29 +1,41 @@
 <mujoco model="inverted pendulum">
-	<compiler inertiafromgeom="true"/>
+	<compiler inertiafromgeom="true" />
 	<default>
-		<joint armature="0" damping="1" limited="true"/>
-		<geom contype="1" conaffinity="1" friction="1 0.9 0.9" rgba="0.7 0.7 0 1"  />
-		<tendon/>
-		<motor ctrlrange="-3 3"/>
+		<joint armature="0" damping="1" limited="true" />
+		<geom contype="1" conaffinity="1" friction="1 .1 .1" rgba="0.7 0.7 0 1" />
+		<tendon />
+		<motor ctrlrange="-3 3" />
 	</default>
-	<option gravity="0 0 -9.81" integrator="RK4" timestep="0.02"/>
-	<size nstack="3000"/>
+	<option gravity="0 0 -9.81" integrator="implicitfast" timestep="0.02" />
+	<size nstack="3000" />
 	<worldbody>
-		<!--geom name="ground" type="plane" pos="0 0 0" /-->
-		<geom name="rail" pos="0 0 0" quat="0.707 0 0.707 0" rgba="0.3 0.3 0.7 1" size="0.02 1" type="cylinder" contype="0" conaffinity="0" />
+		<!--geom
+		name="ground" type="plane" pos="0 0 0" /-->
+		<geom name="rail" pos="0 0 0" quat="0.707 0 0.707 0" rgba="0.3 0.3 0.7 1" size="0.02 1"
+			type="cylinder" contype="0" conaffinity="0" />
 		<body name="cart" pos="0 0 0">
-			<joint axis="1 0 0" limited="true" name="slider" pos="0 0 0" range="-1 1" type="slide"/>
-    		<geom fromto="-0.15 0 0 0.15 0 0" name="cart" rgba="0 0.7 0.7 1" size="0.25 0.25" type="ellipsoid" mass="3" />
-			<!-- <geom name="cart" pos="0 0 0" quat="0.707 0 0.707 0" size="0.1 0.1" type="ellipsoid" mass="3" /> -->
+			<joint
+				axis="1 0 0" limited="true" name="slider" 
+				pos="0 0 0" range="-1 1" type="slide" />
+			<geom pos="0 0 0" name="cart" rgba="0.7 0.7 0.1 1" size="0.2 0.08 0.08"
+				type="box" mass="3" contype="1" conaffinity="1" />
+			<!-- <geom name="cart" pos="0 0 0" quat="0.707 0 0.707 0" size="0.1 0.1"
+			type="ellipsoid" mass="3" /> -->
 		</body>
-			<body name="pole" pos="0 0 0.45">
-				<joint type="free" pos="0 0 0" /> 
-				<!-- axis="0 1 0" name="hinge" pos="0 0 0" range="-90 90" type="hinge"/> -->
-				<geom fromto="0 0 0.41 0 0.0 0.49" name="cpole" rgba="0.7 0. 0.7 1" size="0.1 0.05" type="ellipsoid" mass="20" />
-				<!--                 <body name="pole2" pos="0.001 0 0.6"><joint name="hinge2" type="hinge" pos="0 0 0" axis="0 1 0"/><geom name="cpole2" type="capsule" fromto="0 0 0 0 0 0.6" size="0.05 0.3" rgba="0.7 0 0.7 1"/><site name="tip2" pos="0 0 .6"/></body>-->
-			</body>
+		<body name="pole" pos="0 0 1.0">
+			<joint type="free" pos="0 0 0" />
+			<!-- axis="0 1 0" name="hinge" pos="0 0 0" range="-90 90" type="hinge"/> -->
+			<geom fromto="0.00 0 -0.15   0.00 0 0.15" name="cpole"  rgba="0 0.905 0.854 1" size="0.01"
+				type="capsule" mass="1" contype="1" conaffinity="1" />
+			<geom fromto="-0.06 0 0.20  -0.06 0 0.30" name="ball1" rgba="0. 0.735 0.704 1" type="ellipsoid" size="0.03" contype="1" conaffinity="1" mass="9" />
+			<geom fromto="0.06 0 0.19  0.06 0 0.20" name="ball2" rgba="0. 0.735 0.704 1" type="ellipsoid" size="0.07" contype="1" conaffinity="1" mass="2" />
+			<geom fromto="0 0 -0.15  0 0 -0.16" type="capsule" size="0.04" mass="1" rgba="0 1 0 1" contype="1" conaffinity="1" />
+			<!--                 <body name="pole2" pos="0.001 0 0.6"><joint name="hinge2" type="hinge" pos="0 0 0"
+			axis="0 1 0"/><geom name="cpole2" type="capsule" fromto="0 0 0 0 0 0.6" size="0.05 0.3"
+			rgba="0.7 0 0.7 1"/><site name="tip2" pos="0 0 .6"/></body>-->
+		</body>
 	</worldbody>
 	<actuator>
-		<motor ctrllimited="true" ctrlrange="-3 3" gear="100" joint="slider" name="slide"/>
+		<motor ctrllimited="true" ctrlrange="-3 3" gear="100" joint="slider" name="slide" />
 	</actuator>
 </mujoco>
